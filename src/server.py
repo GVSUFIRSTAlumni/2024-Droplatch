@@ -8,8 +8,11 @@ serversocket.listen(2)
 
 while True:
     connection, address = serversocket.accept()
-    buf = connection.recv(64)
-    if len(buf) > 0:
-        print(buf)
-        break
+    while True:
+        buf = connection.recv(64)
+        print(f"read in a buffer of size {len(buf)}")
+        if len(buf) > 0:
+            print(buf)
+            if buf == "quit":
+                break
 
