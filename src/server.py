@@ -1,5 +1,5 @@
-#!/usr/bin/env python
 import socket
+import sys
 
 # droplatch server
 serversocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -14,5 +14,5 @@ while True:
         if len(buf) > 0:
             print(buf)
             if buf == "quit":
-                break
+                sys.exit(0)
 
