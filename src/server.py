@@ -4,10 +4,11 @@
 import socket
 import selectors
 from typing import Callable
-# import RPi.GPIO as GPIO
+import RPi.GPIO as GPIO
 
 # see https://pinout.xyz
-# GPIO.setmode(GPIO.BOARD)
+GPIO.setmode(GPIO.BOARD)
+GPIO.setup(36, GPIO.HIGH)
 
 ADDR: str = 'localhost'
 PORT: int = 9999
@@ -17,8 +18,8 @@ selector: selectors.BaseSelector = selectors.DefaultSelector()
 
 def setPin(pinNum: int, state: bool):
     """ set a pin high (state == True) or low """
-    # TODO
-    pass
+    # pinNum is the physical pin number, not the GPIO
+    GPIO.output(pinNum, state)
 
 def getPin(pinNum: int) -> bool:
     """ get the state of a pin (true == high) """
