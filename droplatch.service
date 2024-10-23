@@ -1,0 +1,9 @@
+[Unit]
+Description=Droplatch server
+
+[Service]
+ExecStart=/home/pi/2024-Droplatch/src/server.py
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
