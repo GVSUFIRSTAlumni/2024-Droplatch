@@ -12,7 +12,7 @@ MAX_CONNECTIONS: int = 2
 def readSock(sock: socket.socket, mask: int):
     data: bytes = sock.recv(1000)
     if data:
-        print(f"{data.decode("utf-8")}")
+        print(f"{data.decode('utf-8')}")
 
 # setup socket
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)

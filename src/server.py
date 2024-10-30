@@ -15,16 +15,25 @@ PORT: int = 9999
 MAX_CONNECTIONS: int = 2
 
 selector: selectors.BaseSelector = selectors.DefaultSelector()
+droplatch: Droplatch = Droplatch(36)
 
-def setPin(pinNum: int, state: bool):
-    """ set a pin high (state == True) or low """
-    # pinNum is the physical pin number, not the GPIO
-    GPIO.output(pinNum, state)
+class Droplatch:
+    def __init__(self, *pins):
+        # save the pins
+        self._pins: list[int] = list(pins)
+        # Setup pins
+        GPIO.setmode(GPIO.BOARD)
+        pin: int
+        for pin in self._pins:
+            GPIO.setup(pin, GPIO.OUT, initial=GPIO.HIGH)
 
-def getPin(pinNum: int) -> bool:
-    """ get the state of a pin (true == high) """
-    # TODO
-    return False
+    def setPin(pinNum: int, state: bool):
+        """ set a pin high (state == True) or low """
+        GPIO.output(pinNum, state)
+    
+    def readPin(pinNum: int):
+        """ set a pin high (state == True) or low """
+        return GPIO.input(pinNum, state)
 
 def _numericCommand(conn: socket.socket, number: str, on_success: str, func: Callable[int, None]):
     """ helper func for commands in the form <verb> <n> """
@@ -44,16 +53,14 @@ def handleCommand(conn: socket.socket, command: str):
             conn.sendall(b"echo! echo! echo!")
         case ["toggle"]:
             print("toggle requires a numeric argument.")
-        case ["toggle", num]:
-            _numericCommand(conn, num, "toggled pin {number}", lambda n: setPin(n, not getPin(n)))
         case ["set"]:
             print("set requires a numeric argument")
         case ["set", num]:
-            _numericCommand(conn, num, "set pin {number} high", lambda n: setPin(n, True))
+            _numericCommand(conn, num, "set pin {number} high", lambda n: droplatch.setPin(n, True))
         case ["unset"]:
             print("unset requires a numeric argument")
         case ["unset", num]:
-            _numericCommand(conn, num, "set pin {number} low", lambda n: setPin(n, False))
+            _numericCommand(conn, num, "set pin {number} low", lambda n: droplatch.setPin(n, False))
 
 def accept(sock: socket.socket, mask: int):
     """ handle incoming connections """
