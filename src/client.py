@@ -4,6 +4,7 @@
 
 import socket
 import selectors
+from curtsies import Input
 
 ADDR: str = 'localhost'
 PORT: int = 9999
@@ -14,6 +15,14 @@ def readSock(sock: socket.socket, mask: int):
     if data:
         print(f"{data.decode("utf-8")}")
 
+def keyReader():
+    with Input(keynames='curses') as input_generator:
+        for e in input_generator:
+            print(repr(e))
+            match repr(e):
+                case 'e':
+                    print('yay')
+
 # setup socket
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 s.connect((ADDR, PORT))
@@ -21,6 +30,7 @@ s.setblocking(False)
 # setup selector
 selector: selectors.BaseSelector = selectors.DefaultSelector()
 selector.register(s, selectors.EVENT_READ, readSock)
+keyReader()
 
 while True:
     # read in user command
@@ -38,6 +48,7 @@ while True:
     for key, mask in events:
         # we happen to store callbacks in the data, but it is an opaque type
         # that can be anything we want so I am not type hinting it.
+
         callback = key.data
         # the field is called fileobj because you can use selectors on any
         # kind of file descriptor, but it's really the socket here. Sockets
