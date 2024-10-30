@@ -14,9 +14,6 @@ ADDR: str = 'localhost'
 PORT: int = 9999
 MAX_CONNECTIONS: int = 2
 
-selector: selectors.BaseSelector = selectors.DefaultSelector()
-droplatch: Droplatch = Droplatch(36)
-
 class Droplatch:
     def __init__(self, *pins):
         # save the pins
@@ -27,13 +24,16 @@ class Droplatch:
         for pin in self._pins:
             GPIO.setup(pin, GPIO.OUT, initial=GPIO.HIGH)
 
-    def setPin(pinNum: int, state: bool):
+    def setPin(self, pinNum: int, state: bool):
         """ set a pin high (state == True) or low """
-        GPIO.output(pinNum, state)
+        GPIO.output(self._pins[pinNum], state)
     
-    def readPin(pinNum: int):
+    def readPin(self, pinNum: int):
         """ set a pin high (state == True) or low """
-        return GPIO.input(pinNum, state)
+        return GPIO.input(self._pins[pinNum], state)
+
+selector: selectors.BaseSelector = selectors.DefaultSelector()
+droplatch: Droplatch = Droplatch(36)
 
 def _numericCommand(conn: socket.socket, number: str, on_success: str, func: Callable[int, None]):
     """ helper func for commands in the form <verb> <n> """
