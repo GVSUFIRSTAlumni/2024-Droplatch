@@ -53,6 +53,8 @@ def handleCommand(conn: socket.socket, command: str):
             conn.sendall(b"echo! echo! echo!")
         case ["toggle"]:
             print("toggle requires a numeric argument.")
+        case ["toggle", num]:
+            _numericCommand(conn, num, "set pin {number} high", lambda n: droplatch.setPin(n, not droplatch.readPin()))
         case ["set"]:
             print("set requires a numeric argument")
         case ["set", num]:
