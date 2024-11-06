@@ -41,10 +41,8 @@ def _numericCommand(conn: socket.socket, number: str, on_success: str, func: Cal
         num_parsed: int = int(number)
         func(num_parsed)
         conn.sendall(on_success.format(number=num_parsed).encode("utf-8"))
-        # print(on_success.format(number=num_parsed))
     except ValueError:
         conn.sendall(f"cannot parse \"{number}\"".encode("utf-8"))
-        # print(f"cannot parse \"{number}\"")
 
 def handleCommand(conn: socket.socket, command: str):
     """ handle received data; largely just routes to setPin. """
