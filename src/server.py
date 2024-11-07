@@ -33,7 +33,7 @@ class Droplatch:
         return GPIO.input(self._pins[pinNum], state)
 
 selector: selectors.BaseSelector = selectors.DefaultSelector()
-droplatch: Droplatch = Droplatch(36)
+droplatch: Droplatch = Droplatch(36, 38, 40)
 
 def _numericCommand(conn: socket.socket, number: str, on_success: str, func: Callable[int, None]):
     """ helper func for commands in the form <verb> <n> """
