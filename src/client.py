@@ -34,9 +34,11 @@ selector.register(s, selectors.EVENT_READ, readSock)
 def doThings(key: chr):
     user_in: str = ""
 
-    match e:
+    print(f"key: {key}")
+
+    match key:
         case u'1', u'2', u'3', u'4', u'5', u'6', u'7', u'8', u'9':
-            user_in = "toggle " + str(e)
+            user_in = "toggle " + str(key)
             print(f"running toggle {str(e)}")
 
     # send command to server
@@ -63,4 +65,5 @@ def doThings(key: chr):
 
 with Input(keynames='curtsies') as input_generator:
     for e in Input():
+        print(f"e: {e}")
         doThings(e)
