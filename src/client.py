@@ -37,7 +37,7 @@ def doThings(key: chr):
     print(f"key: {key}")
 
     match key:
-        case u'1', u'2', u'3', u'4', u'5', u'6', u'7', u'8', u'9':
+        case '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9':
             user_in = "toggle " + str(key)
             print(f"running toggle {str(e)}")
 
