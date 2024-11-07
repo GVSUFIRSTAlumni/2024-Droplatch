@@ -31,41 +31,30 @@ s.setblocking(False)
 selector: selectors.BaseSelector = selectors.DefaultSelector()
 selector.register(s, selectors.EVENT_READ, readSock)
 
-def doThings(key: chr):
-    user_in: str = ""
-
-    print(f"key: {key}")
-
-    match key:
-        case '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9':
-            user_in = "toggle " + str(key)
-            print(f"running toggle {str(e)}")
-        case _:
-            return # don't do anything
-
-    # send command to server
-    if s.sendall(str.encode(user_in)) != None:
-        print(f"failed to send all of {user_in}")
-
-    # handle "quit" command (could probably be done before sending)
-    if (user_in == "q"):
-        exit(0)
-
-    # check for server response (1s timeout)
-    events = selector.select(timeout=1)
-    key: selectors.SelectorKey
-
-    # mask is a private type
-    for key, mask in events:
-        # we happen to store callbacks in the data, but it is an opaque type
-        # that can be anything we want so I am not type hinting it.
-        callback = key.data
-        # the field is called fileobj because you can use selectors on any
-        # kind of file descriptor, but it's really the socket here. Sockets
-        # just happen to also be a type of file, albeit a virtual one.
-        callback(key.fileobj, mask)
-
 with Input(keynames='curtsies') as input_generator:
-    for e in Input():
-        print(f"e: {e}")
-        doThings(e)
+    while True:
+        a = input_generator.send()
+        if a != None:
+            print(f"found {a}")
+        
+        # send command to server
+        if (a != None):
+            if s.sendall(str.encode(user_in)) != None:
+                print(f"failed to send all of {user_in}")
+
+        # handle "quit" command (could probably be done before sending)
+        if (user_in == "quit"):
+            break
+
+        # check for server response (1s timeout)
+        events = selector.select(timeout=1)
+        key: selectors.SelectorKey
+        # mask is a private type
+        for key, mask in events:
+            # we happen to store callbacks in the data, but it is an opaque type
+            # that can be anything we want so I am not type hinting it.
+            callback = key.data
+            # the field is called fileobj because you can use selectors on any
+            # kind of file descriptor, but it's really the socket here. Sockets
+            # just happen to also be a type of file, albeit a virtual one.
+            callback(key.fileobj, mask)
