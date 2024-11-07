@@ -28,7 +28,7 @@ class Droplatch:
         """ set a pin high (state == True) or low """
         GPIO.output(self._pins[pinNum], state)
     
-    def readPin(self, pinNum: int):
+    def readPin(self, pinNum: int) -> bool:
         """ set a pin high (state == True) or low """
         return GPIO.input(self._pins[pinNum], state)
 
