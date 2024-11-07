@@ -30,20 +30,27 @@ s.setblocking(False)
 # setup selector
 selector: selectors.BaseSelector = selectors.DefaultSelector()
 selector.register(s, selectors.EVENT_READ, readSock)
-keyReader()
 
-while True:
-    # read in user command
-    user_in = input('enter a command > ')
+def doThings(key: chr):
+    user_in: str = ""
+
+    match e:
+        case u'1', u'2', u'3', u'4', u'5', u'6', u'7', u'8', u'9':
+            user_in = "toggle " + str(e)
+            print(f"running toggle {str(e)}")
+
     # send command to server
     if s.sendall(str.encode(user_in)) != None:
         print(f"failed to send all of {user_in}")
+
     # handle "quit" command (could probably be done before sending)
-    if (user_in == "quit"):
-        break
+    if (user_in == "q"):
+        exit(0)
+
     # check for server response (1s timeout)
     events = selector.select(timeout=1)
     key: selectors.SelectorKey
+
     # mask is a private type
     for key, mask in events:
         # we happen to store callbacks in the data, but it is an opaque type
@@ -53,3 +60,7 @@ while True:
         # kind of file descriptor, but it's really the socket here. Sockets
         # just happen to also be a type of file, albeit a virtual one.
         callback(key.fileobj, mask)
+
+with Input(keynames='curtsies') as input_generator:
+    for e in Input():
+        doThings(e)
