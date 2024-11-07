@@ -40,6 +40,8 @@ def doThings(key: chr):
         case '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9':
             user_in = "toggle " + str(key)
             print(f"running toggle {str(e)}")
+        case _:
+            return # don't do anything
 
     # send command to server
     if s.sendall(str.encode(user_in)) != None:
