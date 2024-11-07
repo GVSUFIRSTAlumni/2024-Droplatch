@@ -38,7 +38,7 @@ droplatch: Droplatch = Droplatch(36, 38, 40)
 def _numericCommand(conn: socket.socket, number: str, on_success: str, func: Callable[int, None]):
     """ helper func for commands in the form <verb> <n> """
     try:
-        num_parsed: int = int(number)
+        num_parsed: int = int(number) - 1
         func(num_parsed)
         conn.sendall(on_success.format(number=num_parsed).encode("utf-8"))
     except ValueError:

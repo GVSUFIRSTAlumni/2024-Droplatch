@@ -39,11 +39,11 @@ with Input(keynames='curtsies') as input_generator:
         
         # send command to server
         if (a != None):
-            if s.sendall(str.encode(user_in)) != None:
-                print(f"failed to send all of {user_in}")
+            if s.sendall(str.encode("toggle " + str(a))) != None:
+                print(f"failed to send all of {a}")
 
         # handle "quit" command (could probably be done before sending)
-        if (user_in == "quit"):
+        if (a == "q"):
             break
 
         # check for server response (1s timeout)
