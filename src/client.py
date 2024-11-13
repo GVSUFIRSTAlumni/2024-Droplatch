@@ -36,15 +36,15 @@ with Input(keynames='curtsies') as input_generator:
         a = input_generator.send()
         if a != None:
             print(f"found {a}")
+
+        # handle "quit" command
+        if (str(a) == "q"):
+            break
         
         # send command to server
         if (a != None):
             if s.sendall(str.encode("toggle " + str(a))) != None:
                 print(f"failed to send all of {a}")
-
-        # handle "quit" command (could probably be done before sending)
-        if (a == "q"):
-            break
 
         # check for server response (1s timeout)
         events = selector.select(timeout=1)

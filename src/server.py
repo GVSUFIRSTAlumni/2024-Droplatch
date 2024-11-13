@@ -4,7 +4,10 @@
 import socket
 import selectors
 from typing import Callable
-import RPi.GPIO as GPIO
+try:
+    import RPi.GPIO as GPIO
+except:
+    import Mock.GPIO as GPIO
 
 # see https://pinout.xyz
 GPIO.setmode(GPIO.BOARD)
@@ -29,18 +32,21 @@ class Droplatch:
         GPIO.output(self._pins[pinNum], state)
     
     def readPin(self, pinNum: int) -> bool:
-        """ set a pin high (state == True) or low """
-        return GPIO.input(self._pins[pinNum], state)
+        """ read a pin's state (high == True) """
+        return GPIO.input(self._pins[pinNum])
 
 selector: selectors.BaseSelector = selectors.DefaultSelector()
-droplatch: Droplatch = Droplatch(36, 38, 40)
+droplatch: Droplatch = Droplatch(36, 38, 40, 0, 0, 0, 0, 0, 0)
 
 def _numericCommand(conn: socket.socket, number: str, on_success: str, func: Callable[int, None]):
     """ helper func for commands in the form <verb> <n> """
     try:
         num_parsed: int = int(number) - 1
-        func(num_parsed)
-        conn.sendall(on_success.format(number=num_parsed).encode("utf-8"))
+        if num_parsed >= 0:
+            func(num_parsed)
+            conn.sendall(on_success.format(number=num_parsed+1).encode("utf-8"))
+        else:
+            conn.sendall(f"invalid number \"{number}\"".encode("utf-8"))
     except ValueError:
         conn.sendall(f"cannot parse \"{number}\"".encode("utf-8"))
 
@@ -52,7 +58,7 @@ def handleCommand(conn: socket.socket, command: str):
         case ["toggle"]:
             print("toggle requires a numeric argument.")
         case ["toggle", num]:
-            _numericCommand(conn, num, "set pin {number} high", lambda n: droplatch.setPin(n, not droplatch.readPin()))
+            _numericCommand(conn, num, "set pin {number} high", lambda n: droplatch.setPin(n, not droplatch.readPin(n)))
         case ["set"]:
             print("set requires a numeric argument")
         case ["set", num]:
