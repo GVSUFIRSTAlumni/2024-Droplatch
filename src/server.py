@@ -8,6 +8,8 @@ try:
     import RPi.GPIO as GPIO
 except:
     import Mock.GPIO as GPIO
+import random
+import time
 
 # see https://pinout.xyz
 GPIO.setmode(GPIO.BOARD)
@@ -26,17 +28,41 @@ class Droplatch:
         pin: int
         for pin in self._pins:
             GPIO.setup(pin, GPIO.OUT, initial=GPIO.HIGH)
-
+    
     def setPin(self, pinNum: int, state: bool):
         """ set a pin high (state == True) or low """
         GPIO.output(self._pins[pinNum], state)
+
+    def setPinByValue(self, pinValue: int, state: bool):
+        GPIO.output(pinValue, state)
     
     def readPin(self, pinNum: int) -> bool:
         """ read a pin's state (high == True) """
         return GPIO.input(self._pins[pinNum])
 
+    def randSelect(self):
+        pins =  []
+        for x in range(len(self._pins)):
+            pins.append(self._pins[x])
+
+        while len(pins) > 0:
+            time.sleep(random.randint(5, 15) / 10.0)
+            randnum = random.randint(0, len(pins) - 1)
+            self.setPinByValue(pins[randnum], False)
+            time.sleep(1)
+            self.setPinByValue(pins[randnum], True)
+            del pins[randnum]
+            
+    def zero(self):
+        for x in self._pins:
+            self.setPinByValue(x, False)
+        time.sleep(.5)
+        for x in self._pins:
+            self.setPinByValue(x, True)
+
 selector: selectors.BaseSelector = selectors.DefaultSelector()
-droplatch: Droplatch = Droplatch(36, 38, 40, 0, 0, 0, 0, 0, 0)
+# droplatch: Droplatch = Droplatch(21, 23, 27, 29, 31, 33, 35, 37)
+droplatch: Droplatch = Droplatch(21, 23, 29, 31, 33, 35, 37, 11)
 
 def _numericCommand(conn: socket.socket, number: str, on_success: str, func: Callable[int, None]):
     """ helper func for commands in the form <verb> <n> """
@@ -58,7 +84,7 @@ def handleCommand(conn: socket.socket, command: str):
         case ["toggle"]:
             print("toggle requires a numeric argument.")
         case ["toggle", num]:
-            _numericCommand(conn, num, "set pin {number} high", lambda n: droplatch.setPin(n, not droplatch.readPin(n)))
+            _numericCommand(conn, num, "toggled pin {number}", lambda n: droplatch.setPin(n, not droplatch.readPin(n)))
         case ["set"]:
             print("set requires a numeric argument")
         case ["set", num]:
@@ -67,6 +93,10 @@ def handleCommand(conn: socket.socket, command: str):
             print("unset requires a numeric argument")
         case ["unset", num]:
             _numericCommand(conn, num, "set pin {number} low", lambda n: droplatch.setPin(n, False))
+        case ["random"]:
+            droplatch.randSelect()
+        case ["dropAll"]:
+            droplatch.zero()
 
 def accept(sock: socket.socket, mask: int):
     """ handle incoming connections """

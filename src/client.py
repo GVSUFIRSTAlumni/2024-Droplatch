@@ -35,7 +35,7 @@ with Input(keynames='curtsies') as input_generator:
     while True:
         a = input_generator.send()
         if a != None:
-            print(f"found {a}")
+            print(f"found \"{a}\"")
 
         # handle "quit" command
         if (str(a) == "q"):
@@ -43,8 +43,16 @@ with Input(keynames='curtsies') as input_generator:
         
         # send command to server
         if (a != None):
-            if s.sendall(str.encode("toggle " + str(a))) != None:
-                print(f"failed to send all of {a}")
+            match str(a):
+                case "0":
+                    if s.sendall(str.encode("dropAll")) != None:
+                        print(f"Josh is a goober")
+                case "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8":
+                    if s.sendall(str.encode("toggle " + str(a))) != None:
+                        print(f"failed to send all of {a}")
+                case '9':
+                    if s.sendall(str.encode("random")) != None:
+                        print(F"failed to send all of {a}")
 
         # check for server response (1s timeout)
         events = selector.select(timeout=1)
